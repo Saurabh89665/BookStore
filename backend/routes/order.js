@@ -6,54 +6,68 @@ const Order=require("../models/order");
 const User=require("../models/user");
 
 //place order
-router.post("/place-order",authenticateToken,async(req,res)=>{
-    try{
-        const{id}=req.headers;
-        const{order}=req.body;
+router.post("/place-order", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.headers;
 
-        for(const orderData of order)
-        {
-            const newOrder=new Order({user:id,book:orderData._id});
-            const orderDataFromDb=await newOrder.save();
+    const user = await User.findById(id).populate("cart");
+    if (!user || user.cart.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
 
-            //saving order in user model
-            await User.findByIdAndUpdate(id,{
-                $push:{orders:orderDataFromDb._id},
-            });
-        }
-        return res.json({status:"Success",message:"order places successfully",
-        });
+    for (const book of user.cart) {
+      const newOrder = new Order({
+        user: id,
+        book: book._id,
+        price: book.price,
+        status: "Placed",
+        paymentMode: "Cash on Delivery",
+      });
+
+      const savedOrder = await newOrder.save();
+
+      await User.findByIdAndUpdate(id, {
+        $push: { orders: savedOrder._id },
+      });
     }
-    catch(error)
-    {
-        res
-        .status(500)
-        .json({message:"Internal server error"});
-    }
+
+    // Clear cart
+    await User.findByIdAndUpdate(id, { $set: { cart: [] } });
+
+    res.json({
+      status: "success",
+      message: "Order placed successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
+
 
 //get order histroy of particular  user
-router.get("/get-order-history",authenticateToken,async(req,res)=>{
-    try{
-        const{id}=req.headers;
-        const userData=await User.findById(id).populate({
-        path:"orders",
-        populate:{path:"book"},
+// ✅ GET ORDER HISTORY
+router.get("/get-order-history", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.headers;
+
+    const user = await User.findById(id).populate({
+      path: "orders",
+      populate: { path: "book" },
     });
 
-    const orderData=userData.orders.reverse();
-    return res.json({
-        status:"success",
-        data:"orderData",
+    const orders = user.orders.reverse();
+
+    res.json({
+      status: "success",
+      data: orders,
     });
-    }
-    catch(error)
-    {
-        res
-        .status(500)
-        .json({message:"Internal server error"});
-    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
+
 
 //get all order --admin
 router.get("/get-all-orders",authenticateToken,async(req,res)=>{
@@ -80,22 +94,20 @@ router.get("/get-all-orders",authenticateToken,async(req,res)=>{
 });
 
 //update order--admin
-router.post("/place-order",authenticateToken,async(req,res)=>{
-    try{
-        const {id}=req.params;
-        await Order.findByIdAndUpdate(id,{status:req.body.status});
-        return res.json({
-            status:"success",
-            message:"Status updated Successfully",
-        });
-    }
-    catch(error)
-    {
-        res
-        .status(500)
-        .json({message:"Internal server error"});
-    }
+router.post("/place-order", authenticateToken, async (req, res) => {
+  console.log("🔥 PLACE ORDER API HIT");   // 🔍
+  console.log("HEADERS 👉", req.headers); // 🔍
+
+  try {
+    res.json({
+      status: "success",
+      message: "Order placed successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
+
 
 
 module.exports=router;

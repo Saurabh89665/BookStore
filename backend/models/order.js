@@ -1,23 +1,32 @@
-const mongoose=require("mongoose");
-const order=new mongoose.Schema(
-    {
-        user:
-        {
-            type:mongoose.Types.ObjectId,
-            ref:"user",
-        },
-        book:
-        {
-            type:mongoose.Types.ObjectId,
-            ref:"books",
-        },
-        status:
-        {
-            type:String,
-            default:"order placed",
-            enum:["order placed","out of delivery,delivered ,canceled"],
-        },
+const mongoose = require("mongoose");
+
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "user",
+      required: true,
     },
-    {timestamps:true}
+    book: {
+      type: mongoose.Types.ObjectId,
+      ref: "book",
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      default: "Placed",
+      enum: ["Placed", "Out for Delivery", "Delivered", "Canceled"],
+    },
+    paymentMode: {
+      type: String,
+      default: "Cash on Delivery",
+    },
+  },
+  { timestamps: true }
 );
-module.exports=mongoose.model("order",order);
+
+module.exports = mongoose.model("order", orderSchema);

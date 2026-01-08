@@ -41,9 +41,8 @@ const Sidebar = ({ data = {} }) => {
             </Link>
           </li>
           <li>
-            <Link to="/profile/orderhistory" className="block px-3 py-2 rounded-md text-zinc-100 hover:bg-zinc-800 transition">
-              Order History
-            </Link>
+            <Link to="/profile/orderhistory">Order History</Link>
+
           </li>
           <li>
             <Link to="/profile/settings" className="block px-3 py-2 rounded-md text-zinc-100 hover:bg-zinc-800 transition">

@@ -42,7 +42,7 @@ const user=new mongoose.Schema(
             ],
              orders:[
             {
-                type:mongoose.Types.ObjectId,
+                type:mongoose.Schema.Types.ObjectId,
                 ref:"order",
             },
             ],

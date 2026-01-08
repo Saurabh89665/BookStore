@@ -22,6 +22,7 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
       localStorage.removeItem("role");
+      localStorage.removeItem("id");  
     },
 
     changeRole(state, action) {

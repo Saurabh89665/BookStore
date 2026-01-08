@@ -12,23 +12,20 @@ const Profile = () => {
 
   useEffect(() => {
     if (!id || !token) {
-      // if not logged in you probably already redirect elsewhere
       setLoading(false);
       return;
     }
 
     const fetchProfile = async () => {
-      setLoading(true);
       try {
         const headers = { id, Authorization: `Bearer ${token}` };
-        const response = await axios.get(
+        const res = await axios.get(
           "http://localhost:1000/api/v1/get-user-information",
           { headers }
         );
-        const data = response.data?.data ?? response.data;
-        setProfile(data);
+        setProfile(res.data?.data ?? res.data);
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -40,20 +37,20 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-zinc-300">Loading profile...</p>
+        Loading profile...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white  mt-8 py-8">
+    <div className="min-h-screen bg-black text-white mt-8 py-8">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 px-4">
-        {/* Sidebar receives profile data */}
+        {/* LEFT */}
         <Sidebar data={profile || {}} />
 
-        {/* Right side: nested routes will render here */}
+        {/* RIGHT (CHILD ROUTES HERE) */}
         <div className="bg-zinc-900 rounded-xl p-6 shadow-md min-h-[300px]">
-          <Outlet context={{ profile }} />
+          <Outlet />
         </div>
       </div>
     </div>
